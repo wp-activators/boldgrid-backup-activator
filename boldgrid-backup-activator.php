@@ -4,7 +4,7 @@
  * Plugin Name:       Total Upkeep Activator
  * Plugin URI:        https://github.com/wp-activators/boldgrid-backup-activator
  * Description:       Total Upkeep Plugin Activator
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 5.3.0
  * Requires PHP:      7.4
  * Author:            mohamedhk2
@@ -53,12 +53,40 @@ add_filter( 'option_active_plugins', function ( $plugins, $option_name ) {
 	return $plugins;
 }, 99, 2 );
 
-if ( ! file_exists( $file = ( $directory = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'boldgrid-backup-premium' ) . DIRECTORY_SEPARATOR . 'boldgrid-backup-premium.php' ) ) {
-	if ( ! is_dir( $directory ) ) {
-		mkdir( $directory, 0777, true );
-	}
-	touch( $file );
+$file = ( $directory = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'boldgrid-backup-premium' ) . DIRECTORY_SEPARATOR . 'boldgrid-backup-premium.php';
+if ( ! is_dir( $directory ) ) {
+	mkdir( $directory, 0777, true );
 }
+$plugin_data  = get_plugin_data( WP_PLUGIN_DIR . '/boldgrid-backup/boldgrid-backup.php' );
+if ( ! file_exists( $file ) ) {
+	touch( $file );
+	goto make_fake_plugin;
+}
+premium_data:
+$premium_data = get_plugin_data( WP_PLUGIN_DIR . '/boldgrid-backup-premium/boldgrid-backup-premium.php' );
+if ( empty( $premium_data['Name'] ) ) {
+	goto make_fake_plugin;
+}
+if ( version_compare( $premium_data['Version'], $plugin_data['Version'], '<' ) && ( $premium_data['Name'] == 'Total Upkeep Premium Faked' ) ) {
+	make_fake_plugin:
+	$php = '<?php';
+	file_put_contents( $file,
+		<<<EOF
+{$php}
+/**
+ * @wordpress-plugin
+ * Plugin Name:       Total Upkeep Premium Faked
+ * Plugin URI:        https://wordpress.org/plugins/boldgrid-backup/
+ * Description:       Fake plugin for Total Upkeep Premium
+ * Version:           {$plugin_data['Version']}
+ * Author:            mohamedhk2
+ * Author URI:        https://github.com/mohamedhk2
+ **/
+EOF
+	);
+	goto premium_data;
+}
+
 function boldgrid_backup_activator_license(): stdClass {
 	$plugin              = 'boldgrid-backup';
 	$inspirations        = 'boldgrid-inspirations';
