@@ -4,21 +4,22 @@
  * Plugin Name:       Total Upkeep Activator
  * Plugin URI:        https://github.com/wp-activators/boldgrid-backup-activator
  * Description:       Total Upkeep Plugin Activator
- * Version:           1.1.0
- * Requires at least: 5.3.0
- * Requires PHP:      7.4
+ * Version:           1.2.0
+ * Requires at least: 5.9.0
+ * Requires PHP:      7.2
  * Author:            mohamedhk2
  * Author URI:        https://github.com/mohamedhk2
  **/
 
 defined( 'ABSPATH' ) || exit;
-const TOTAL_UPKEEP_ACTIVATOR_NAME   = 'Total Upkeep Activator';
-const TOTAL_UPKEEP_ACTIVATOR_DOMAIN = 'boldgrid-backup-activator';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'functions.php';
+$TOTAL_UPKEEP_ACTIVATOR_NAME   = 'Total Upkeep Activator';
+$TOTAL_UPKEEP_ACTIVATOR_DOMAIN = 'boldgrid-backup-activator';
+$functions                     = require_once __DIR__ . DIRECTORY_SEPARATOR . 'functions.php';
+extract( $functions );
 if (
-	activator_admin_notice_ignored()
-	|| activator_admin_notice_plugin_install( 'boldgrid-backup/boldgrid-backup.php', 'boldgrid-backup', 'Total Upkeep', TOTAL_UPKEEP_ACTIVATOR_NAME, TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
-	|| activator_admin_notice_plugin_activate( 'boldgrid-backup/boldgrid-backup.php', TOTAL_UPKEEP_ACTIVATOR_NAME, TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
+	$activator_admin_notice_ignored()
+	|| $activator_admin_notice_plugin_install( 'boldgrid-backup/boldgrid-backup.php', 'boldgrid-backup', 'Total Upkeep', $TOTAL_UPKEEP_ACTIVATOR_NAME, $TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
+	|| $activator_admin_notice_plugin_activate( 'boldgrid-backup/boldgrid-backup.php', $TOTAL_UPKEEP_ACTIVATOR_NAME, $TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
 ) {
 	return;
 }
@@ -26,7 +27,7 @@ if (
 use Boldgrid\Library\Library\Configs;
 
 add_filter( 'Boldgrid\Library\Library\Notice\ClaimPremiumKey_enable', '__return_true', 20 );
-add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) {
+add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) use ( $activator_json_response ) {
 	if ( ! class_exists( Configs::class ) ) {
 		return $pre;
 	}
@@ -38,11 +39,11 @@ add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) {
 			$data->result->data->site_hash = $parsed_args['body']['key'] ?? md5( 'free4all' );
 			$data->result->data->asset_id  = 'free4all';
 
-			return activator_json_response( $data );
+			return $activator_json_response( $data );
 		case Configs::get( 'api' ) . '/api/plugin/getLicense?v=' . 2:
 			$data->result->data = boldgrid_backup_activator_license();
 
-			return activator_json_response( $data );
+			return $activator_json_response( $data );
 	}
 
 	return $pre;
@@ -57,7 +58,7 @@ $file = ( $directory = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'boldgrid-backup-pr
 if ( ! is_dir( $directory ) ) {
 	mkdir( $directory, 0777, true );
 }
-$plugin_data  = get_plugin_data( WP_PLUGIN_DIR . '/boldgrid-backup/boldgrid-backup.php' );
+$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/boldgrid-backup/boldgrid-backup.php' );
 if ( ! file_exists( $file ) ) {
 	touch( $file );
 	goto make_fake_plugin;
