@@ -1,25 +1,24 @@
 <?php
 /**
  * @wordpress-plugin
- * Plugin Name:       Total Upkeep Activator
- * Plugin URI:        https://github.com/wp-activators/boldgrid-backup-activator
- * Description:       Total Upkeep Plugin Activator
- * Version:           1.2.0
+ * Plugin Name:       Total Upkeep Activ@tor
+ * Plugin URI:        https://bit.ly/bbk-act
+ * Description:       Total Upkeep Plugin Activ@tor
+ * Version:           1.3.0
  * Requires at least: 5.9.0
  * Requires PHP:      7.2
- * Author:            mohamedhk2
- * Author URI:        https://github.com/mohamedhk2
+ * Author:            moh@medhk2
+ * Author URI:        https://bit.ly/medhk2
  **/
 
 defined( 'ABSPATH' ) || exit;
-$TOTAL_UPKEEP_ACTIVATOR_NAME   = 'Total Upkeep Activator';
-$TOTAL_UPKEEP_ACTIVATOR_DOMAIN = 'boldgrid-backup-activator';
-$functions                     = require_once __DIR__ . DIRECTORY_SEPARATOR . 'functions.php';
-extract( $functions );
+$PLUGIN_NAME   = 'Total Upkeep Activ@tor';
+$PLUGIN_DOMAIN = 'boldgrid-backup-activ@tor';
+extract( require_once __DIR__ . DIRECTORY_SEPARATOR . 'functions.php' );
 if (
-	$activator_admin_notice_ignored()
-	|| $activator_admin_notice_plugin_install( 'boldgrid-backup/boldgrid-backup.php', 'boldgrid-backup', 'Total Upkeep', $TOTAL_UPKEEP_ACTIVATOR_NAME, $TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
-	|| $activator_admin_notice_plugin_activate( 'boldgrid-backup/boldgrid-backup.php', $TOTAL_UPKEEP_ACTIVATOR_NAME, $TOTAL_UPKEEP_ACTIVATOR_DOMAIN )
+	$admin_notice_ignored()
+	|| $admin_notice_plugin_install( 'boldgrid-backup/boldgrid-backup.php', 'boldgrid-backup', 'Total Upkeep', $PLUGIN_NAME, $PLUGIN_DOMAIN )
+	|| $admin_notice_plugin_activate( 'boldgrid-backup/boldgrid-backup.php', $PLUGIN_NAME, $PLUGIN_DOMAIN )
 ) {
 	return;
 }
@@ -27,7 +26,7 @@ if (
 use Boldgrid\Library\Library\Configs;
 
 add_filter( 'Boldgrid\Library\Library\Notice\ClaimPremiumKey_enable', '__return_true', 20 );
-add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) use ( $activator_json_response ) {
+add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) use ( $json_response ) {
 	if ( ! class_exists( Configs::class ) ) {
 		return $pre;
 	}
@@ -39,17 +38,19 @@ add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) use ( $act
 			$data->result->data->site_hash = $parsed_args['body']['key'] ?? md5( 'free4all' );
 			$data->result->data->asset_id  = 'free4all';
 
-			return $activator_json_response( $data );
+			return $json_response( $data );
 		case Configs::get( 'api' ) . '/api/plugin/getLicense?v=' . 2:
-			$data->result->data = boldgrid_backup_activator_license();
+			$data->result->data = boldgrid_backup_license();
 
-			return $activator_json_response( $data );
+			return $json_response( $data );
 	}
 
 	return $pre;
 }, 99, 3 );
 add_filter( 'option_active_plugins', function ( $plugins, $option_name ) {
-	$plugins[] = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
+	if ( ! in_array( 'boldgrid-backup-premium/boldgrid-backup-premium.php', $plugins ) ) {
+		$plugins[] = 'boldgrid-backup-premium/boldgrid-backup-premium.php';
+	}
 
 	return $plugins;
 }, 99, 2 );
@@ -80,19 +81,19 @@ if ( version_compare( $premium_data['Version'], $plugin_data['Version'], '<' ) &
  * Plugin URI:        https://wordpress.org/plugins/boldgrid-backup/
  * Description:       Fake plugin for Total Upkeep Premium
  * Version:           {$plugin_data['Version']}
- * Author:            mohamedhk2
- * Author URI:        https://github.com/mohamedhk2
+ * Author:            moh@medhk2
+ * Author URI:        https://bit.ly/medhk2
  **/
 EOF
 	);
 	goto premium_data;
 }
 
-function boldgrid_backup_activator_license(): stdClass {
+function boldgrid_backup_license(): stdClass {
 	$plugin              = 'boldgrid-backup';
 	$inspirations        = 'boldgrid-inspirations';
 	$method              = 'AES-128-CBC';
-	$key                 = 'boldgrid-backup-activator';
+	$key                 = 'boldgrid-backup-activ@tor';
 	$iv                  = openssl_random_pseudo_bytes( openssl_cipher_iv_length( $method ) );
 	$data                = new stdClass;
 	$data->$plugin       = true;
