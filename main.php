@@ -4,7 +4,7 @@
  * Plugin Name:       Total Upkeep Activ@tor
  * Plugin URI:        https://bit.ly/bbk-act
  * Description:       Total Upkeep Plugin Activ@tor
- * Version:           1.3.0
+ * Version:           1.3.1
  * Requires at least: 5.9.0
  * Requires PHP:      7.2
  * Author:            moh@medhk2
@@ -25,6 +25,7 @@ if (
 
 use Boldgrid\Library\Library\Configs;
 
+add_site_option( 'boldgrid_api_key', 'boldgrid-backup-activator' );
 add_filter( 'Boldgrid\Library\Library\Notice\ClaimPremiumKey_enable', '__return_true', 20 );
 add_filter( 'pre_http_request', function ( $pre, $parsed_args, $url ) use ( $json_response ) {
 	if ( ! class_exists( Configs::class ) ) {
